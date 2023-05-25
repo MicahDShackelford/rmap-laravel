@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.0.1](https://github.com/MicahDShackelford/rmap-laravel/compare/v1.0.0...v1.0.1) (2023-05-25)
+
+
+### Miscellaneous Chores
+
+* add readme details ([2d9c5a8](https://github.com/MicahDShackelford/rmap-laravel/commit/2d9c5a81c17428d9bb26b5228d9cdc0ad1feb126))
+
 ## 1.0.0 (2023-05-25)
 
 
