@@ -5,15 +5,7 @@
 [![GitHub Code Style Action Status](https://img.shields.io/github/actions/workflow/status/micahdshackelford/rmap-laravel/fix-php-code-style-issues.yml?branch=main&label=code%20style&style=flat-square)](https://github.com/micahdshackelford/rmap-laravel/actions?query=workflow%3A"Fix+PHP+code+style+issues"+branch%3Amain)
 [![Total Downloads](https://img.shields.io/packagist/dt/micahdshackelford/rmap-laravel.svg?style=flat-square)](https://packagist.org/packages/micahdshackelford/rmap-laravel)
 
-This is where your description should go. Limit it to a paragraph or two. Consider adding a small example.
-
-## Support us
-
-[<img src="https://github-ads.s3.eu-central-1.amazonaws.com/rmap-laravel.jpg?t=1" width="419px" />](https://spatie.be/github-ad-click/rmap-laravel)
-
-We invest a lot of resources into creating [best in class open source packages](https://spatie.be/open-source). You can support us by [buying one of our paid products](https://spatie.be/open-source/support-us).
-
-We highly appreciate you sending us a postcard from your hometown, mentioning which of our package(s) you are using. You'll find our address on [our contact page](https://spatie.be/about-us). We publish all received postcards on [our virtual postcard wall](https://spatie.be/open-source/postcards).
+Adds the ability to specify external foreign keys in database migrations.
 
 ## Installation
 
@@ -23,38 +15,69 @@ You can install the package via composer:
 composer require micahdshackelford/rmap-laravel
 ```
 
-You can publish and run the migrations with:
+Register the service provider:
 
-```bash
-php artisan vendor:publish --tag="rmap-laravel-migrations"
-php artisan migrate
-```
-
-You can publish the config file with:
-
-```bash
-php artisan vendor:publish --tag="rmap-laravel-config"
-```
-
-This is the contents of the published config file:
-
+_in `config/app.php`_
 ```php
-return [
-];
+    'providers' => [
+        ...
+        /*
+         * Package Service Providers...
+         */
+        MicahDShackelford\RmapLaravel\RmapLaravelServiceProvider::class,
+        ...
+    ]
 ```
 
-Optionally, you can publish the views using
-
-```bash
-php artisan vendor:publish --tag="rmap-laravel-views"
-```
+Run the migration: `0000_00_00_000000_create_rmap_relationships_table.php`
 
 ## Usage
 
+### Creating a foreign relationship (from migration)
+
+1. Create a new migration: `php artisan make:migration [name] --create [table]`
+2. Define an column & external foreign key relationship
+
 ```php
-$rmapLaravel = new MicahDShackelford\RmapLaravel();
-echo $rmapLaravel->echoPhrase('Hello, MicahDShackelford!');
+...
+Schema::create('[table]', function (Blueprint $table) {
+    ...
+    $table->uuid('external_uuid');
+    ...
+    
+    $table->externalForeign('test_uuid') // Name of the column on this table
+        ->connection('external_connection') // External connection name
+        ->on('tests') // External table
+        ->references('uuid') // External column
+        ->schema("default"); // (optional) Schema the external table.column lives on 
+});
+...
 ```
+
+### Creating a foreign relationship (from command)
+
+Use `php artisan rmap:create` and follow the prompts.
+
+### Dropping a foreign relationship (from migration)
+
+1. Create a roll migration: `php artisan make:migration [name] --table [table]`
+2. Define an column & external foreign key relationship
+
+```php
+...
+Schema::table('[table]', function (Blueprint $table) {
+    $table->dropExternalForeign('test_uuid'); // Name of the column on this table
+        // ->connection('external_connection') // (optional) External connection name
+        // ->on('tests') // (optional) External table
+        // ->references('uuid') // (optional) External column
+        // ->schema("default"); // (optional) Schema the external table.column lives on 
+});
+...
+```
+
+### Clear all foreign relationships (from command)
+
+Use `php artisan rmap:clear` and follow the prompts.
 
 ## Testing
 
